@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,23 +6,28 @@ namespace Test
 {
     public class TileSelectionUIManager : MonoBehaviour
     {
-        public GameObject[] tilePrefabs; // Список доступных префабов тайлов
         public Transform buttonContainer; // Контейнер для кнопок (например, Panel)
         public Button buttonPrefab; // Префаб кнопки
+        public GameObject tileLoaderManager;
+        
+        private List<GameObject> loadedTiles = new(); // Динамический список тайлов
+        private TileLoader _tileLoader;
 
-        private int selectedTileIndex = -1; // Индекс выбранного тайла (-1, если не выбран)
+        private int _selectedTileIndex = -1; // Индекс выбранного тайла (-1, если не выбран)
 
         void Start()
         {
+            _tileLoader = tileLoaderManager.GetComponent<TileLoader>();
+            loadedTiles = _tileLoader.LoadTiles();
             PopulateTileButtons();
         }
 
         void PopulateTileButtons()
         {
-            int width = tilePrefabs.Length / 2;
-            for (int i = 0; i < tilePrefabs.Length; i++)
+            int width = loadedTiles.Count / 2;
+            for (int i = 0; i < loadedTiles.Count; i++)
             {
-                GameObject tile = tilePrefabs[i];
+                GameObject tile = loadedTiles[i];
                 
                 // Создаем новую кнопку
                 Button newButton = Instantiate(buttonPrefab, buttonContainer);
@@ -32,28 +38,27 @@ namespace Test
                 // Настраиваем изображение кнопки
                 Image buttonImage = newButton.GetComponent<Image>();
                 Sprite tileSprite = tile.GetComponent<HexTile>().Sprite;
-                if (tileSprite != null)
-                {
-                    buttonImage.sprite = tileSprite;
-                }
+                buttonImage.sprite = tileSprite;
+                
+                // Копируем индекс в локальную переменную, чтобы избежать замыканий
+                int index = i; 
 
                 // Добавляем обработчик клика
-                int index = i; // Копируем индекс в локальную переменную, чтобы избежать замыканий
                 newButton.onClick.AddListener(() => SelectTile(index));
             }
         }
 
         public void SelectTile(int index)
         {
-            selectedTileIndex = index;
-            Debug.Log($"Выбранный тайл: {tilePrefabs[selectedTileIndex].name}");
+            _selectedTileIndex = index;
+            Debug.Log($"Выбранный тайл: {loadedTiles[_selectedTileIndex].name}");
         }
 
         public GameObject GetSelectedTilePrefab()
         {
-            if (selectedTileIndex >= 0 && selectedTileIndex < tilePrefabs.Length)
+            if (_selectedTileIndex >= 0 && _selectedTileIndex < loadedTiles.Count)
             {
-                return tilePrefabs[selectedTileIndex];
+                return loadedTiles[_selectedTileIndex];
             }
             return null;
         }

@@ -381,6 +381,54 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7465155209122778733, guid: 68815519978fb7e4c9664d4fe789268e, type: 3}
   m_PrefabInstance: {fileID: 278979739}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &802392957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 802392959}
+  - component: {fileID: 802392958}
+  m_Layer: 0
+  m_Name: TileLoaderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &802392958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802392957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91192b51368c4124999a6f9b5d6eabce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configPath: Configs/tiles_config.json
+  modelsPath: Tiles/
+  materialsPath: Materials/
+  iconsPath: UI/
+--- !u!4 &802392959
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802392957}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &816462099
 GameObject:
   m_ObjectHideFlags: 0
@@ -1006,13 +1054,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7839c739ffb9fb40958d69a22af0343, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefabs:
-  - {fileID: 5537030306065067224, guid: 587e3f61ef8712d4c9e0e78f0366ba3f, type: 3}
-  - {fileID: 9170128411470040131, guid: a4f6aa19147440c4199f5e99192bff6e, type: 3}
-  - {fileID: 4111281028923099780, guid: 31c7d7a57778fa74c85bec306b5c8b51, type: 3}
-  - {fileID: 6367753803496783848, guid: 9adb27b2dbe5e7a4fa0da40cbf1fc3e8, type: 3}
   buttonContainer: {fileID: 483792038}
   buttonPrefab: {fileID: 8075538791257310326, guid: 9faa1d4fff45a474aacc97907630d29d, type: 3}
+  tileLoaderManager: {fileID: 802392957}
 --- !u!4 &2036910029
 Transform:
   m_ObjectHideFlags: 0
@@ -1036,6 +1080,7 @@ SceneRoots:
   - {fileID: 1115525157}
   - {fileID: 1366106674}
   - {fileID: 867945504}
+  - {fileID: 802392959}
   - {fileID: 1733578270}
   - {fileID: 509830257}
   - {fileID: 2036910029}

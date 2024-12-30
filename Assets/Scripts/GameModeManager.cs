@@ -69,7 +69,7 @@ namespace Test
                     
                     // Перемещаем персонажа в центре первого тайла
                     Vector3 spawnPosition = hexPlacementManager.GetFirstPlacedTileSpawnPosition();
-                    player.transform.position = spawnPosition + new Vector3(0, 1, 0); // Смещаем над тайлом;
+                    player.transform.position = spawnPosition;// + new Vector3(0, 1, 0); // Смещаем над тайлом;
                     
                     player.SetActive(true);
 

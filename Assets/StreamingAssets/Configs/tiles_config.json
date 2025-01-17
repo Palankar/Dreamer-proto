@@ -1,0 +1,9 @@
+﻿[
+  {
+    "name": "Test1",
+    "modelFile": "Test_1.obj",
+    "materialFile": "test",
+    "iconFile": "Tile1.png",
+    "spawnPosition": [-0.05, 1.0, -0.05]
+  }
+]

@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Test
 {
-    public class ResourcesLoader : MonoBehaviour
+    public class StreamingAssetsLoader : MonoBehaviour
     {
         public List<GameObject> LoadTiles(string configPath, string modelsPath, string materialsPath, string iconsPath)
         {
             List<GameObject> loadedTiles = new List<GameObject>();
-            string fullPath = Path.Combine(Application.dataPath, configPath);
+            string fullPath = Path.Combine(Application.streamingAssetsPath, configPath);
             
             if (!File.Exists(fullPath))
             {
@@ -20,7 +20,7 @@ namespace Test
             
             string jsonContent = File.ReadAllText(fullPath);
             List<TileConfig> tileConfigs = JsonConvert.DeserializeObject<List<TileConfig>>(jsonContent);
-
+            
             foreach (var tileConfig in tileConfigs)
             {
                 GameObject model = LoadModel(modelsPath, tileConfig.modelFile);
@@ -36,18 +36,17 @@ namespace Test
 
                 model.AddComponent<MeshCollider>();
 
-                Material material = LoadMaterial(materialsPath, tileConfig.materialFile);
-                if (material != null)
-                {
-                    MeshRenderer renderer = model.GetComponentInChildren<MeshRenderer>();
-                    if (renderer != null)
-                        renderer.material = material;
-                }
+                Material material = FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, tileConfig.materialFile + ".json"));
 
-                Sprite icon = LoadIcon(iconsPath, tileConfig.iconFile);
+                MeshRenderer meshRenderer = model.AddComponent<MeshRenderer>();
+                meshRenderer.material = material;
+                
+                string iconPath = Path.Combine(Application.streamingAssetsPath, iconsPath, tileConfig.iconFile);
+                Sprite icon = FilesLoader.LoadSpriteFromPath(iconPath);
+                
                 HexTile hexTile = model.AddComponent<HexTile>();
                 hexTile.Sprite = icon;
-
+                
                 GameObject spawnPosition = new GameObject("SpawnPosition");
                 spawnPosition.transform.parent = model.transform;
                 spawnPosition.transform.localPosition = new Vector3(
@@ -57,6 +56,7 @@ namespace Test
                 );
 
                 hexTile.spawnPosition = spawnPosition;
+
                 loadedTiles.Add(model);
             }
 
@@ -65,20 +65,18 @@ namespace Test
 
         private GameObject LoadModel(string modelsPath, string modelFile)
         {
-            string modelPath = Path.Combine(modelsPath, modelFile);
-            return Resources.Load<GameObject>(modelPath);
-        }
+            string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath, modelFile);
+            Mesh mesh = FilesLoader.LoadObjMeshFromPath(modelPath);
+            
+            GameObject model = new GameObject();
 
-        private Material LoadMaterial(string materialsPath, string materialFile)
-        {
-            string materialPath = Path.Combine(materialsPath, materialFile);
-            return Resources.Load<Material>(materialPath);
-        }
-
-        private Sprite LoadIcon(string iconsPath, string iconFile)
-        {
-            string iconPath = Path.Combine(iconsPath, iconFile);
-            return Resources.Load<Sprite>(iconPath);
+            // Привязка Mesh к объекту
+            MeshFilter meshFilter = model.AddComponent<MeshFilter>();
+            meshFilter.mesh = mesh;
+            
+            return model;
         }
     }
 }
+
+

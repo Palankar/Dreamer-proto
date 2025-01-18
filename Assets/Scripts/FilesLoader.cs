@@ -1,85 +1,76 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Test
 {
-    public class OBJLoader : MonoBehaviour
+    public static class FilesLoader
     {
-        public List<GameObject> LoadOBJ(string configPath, string modelsPath, string materialsPath, string iconsPath)
+        public static Material LoadMaterialFromConfig(string configFilePath)
         {
-            List<GameObject> loadedTiles = new List<GameObject>();
-            string fullPath = Path.Combine(Application.streamingAssetsPath, configPath);
-            
+            string fullPath = Path.Combine(Application.streamingAssetsPath, configFilePath);
+
             if (!File.Exists(fullPath))
             {
-                Debug.LogError($"Файл конфигурации не найден: {fullPath}");
-                return loadedTiles;
+                Debug.LogError($"Material config file not found: {fullPath}");
+                return null;
             }
-            
+
+            // Чтение конфигурации
             string jsonContent = File.ReadAllText(fullPath);
-            List<TileConfig> tileConfigs = JsonConvert.DeserializeObject<List<TileConfig>>(jsonContent);
-            
-            foreach (var tileConfig in tileConfigs)
+            MaterialConfig config = JsonUtility.FromJson<MaterialConfig>(jsonContent);
+
+            // Создание материала
+            Shader shader = Shader.Find(config.shader);
+            if (shader == null)
             {
-                GameObject model = LoadModel(modelsPath, tileConfig.modelFile);
-                if (model != null)
+                Debug.LogError($"Shader not found: {config.shader}");
+                return null;
+            }
+
+            Material material = new Material(shader);
+
+            // Установка цвета
+            Color color = new Color(config.color[0], config.color[1], config.color[2], config.color[3]);
+            material.color = color;
+
+            // Загрузка текстуры
+            if (!string.IsNullOrEmpty(config.texture))
+            {
+                string texturePath = Path.Combine(Application.streamingAssetsPath, config.texture);
+                if (File.Exists(texturePath))
                 {
-                    model = Instantiate(model, new Vector3(1000, 0, 1000), Quaternion.identity);
+                    byte[] textureData = File.ReadAllBytes(texturePath);
+                    Texture2D texture = new Texture2D(2, 2); // Создаем пустую текстуру
+                    texture.LoadImage(textureData); // Загружаем изображение
+                    material.mainTexture = texture;
                 }
                 else
                 {
-                    Debug.LogWarning($"Не удалось загрузить модель {tileConfig.modelFile}");
-                    continue;
+                    Debug.LogWarning($"Texture file not found: {texturePath}");
                 }
-
-                model.AddComponent<MeshCollider>();
-
-                Material material = MaterialLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, tileConfig.materialFile + ".json"));
-
-                MeshRenderer meshRenderer = model.AddComponent<MeshRenderer>();
-                meshRenderer.material = material;
-                
-                Sprite icon = LoadIcon(iconsPath, tileConfig.iconFile);
-                HexTile hexTile = model.AddComponent<HexTile>();
-                hexTile.Sprite = icon;
-                
-                GameObject spawnPosition = new GameObject("SpawnPosition");
-                spawnPosition.transform.parent = model.transform;
-                spawnPosition.transform.localPosition = new Vector3(
-                    tileConfig.spawnPosition[0],
-                    tileConfig.spawnPosition[1],
-                    tileConfig.spawnPosition[2]
-                );
-
-                hexTile.spawnPosition = spawnPosition;
-
-                loadedTiles.Add(model);
             }
 
-            return loadedTiles;
+            return material;
         }
 
-        private Sprite LoadIcon(string iconsPath, string iconFile)
+        public static Sprite LoadSpriteFromPath(string path)
         {
-            string iconPath = Path.Combine(Application.streamingAssetsPath, iconsPath, iconFile);
-            if (File.Exists(iconPath))
+            if (File.Exists(path))
             {
-                byte[] textureData = File.ReadAllBytes(iconPath);
+                byte[] textureData = File.ReadAllBytes(path);
                 Texture2D texture = new Texture2D(2, 2); // Создаем пустую текстуру
                 texture.LoadImage(textureData); // Загружаем изображение
                 return Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), Vector2.zero);
             }
-            Debug.LogWarning($"Icon file not found: {iconPath}");
+            Debug.LogWarning($"Sprite file not found: {path}");
             return null;
         }
 
-        private GameObject LoadModel(string modelsPath, string modelFile)
+        public static Mesh LoadObjMeshFromPath(string path)
         {
-            string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath, modelFile);
-            if (File.Exists(modelPath))
+            if (File.Exists(path))
             {
                 // Списки для хранения данных из .obj
                 List<Vector3> vertices = new List<Vector3>();
@@ -93,12 +84,13 @@ namespace Test
                 List<Vector2> tempUV = new List<Vector2>();
 
                 // Чтение .obj файла построчно
-                string[] lines = File.ReadAllLines(modelPath);
+                string[] lines = File.ReadAllLines(path);
 
                 foreach (string line in lines)
                 {
                     string[] tokens = line.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
-                    if (tokens.Length == 0 || tokens[0].StartsWith("#")) continue; // Пропустить комментарии и пустые строки
+                    if (tokens.Length == 0 || tokens[0].StartsWith("#"))
+                        continue; // Пропустить комментарии и пустые строки
 
                     switch (tokens[0])
                     {
@@ -132,6 +124,7 @@ namespace Test
                                 {
                                     Debug.LogError("Incorrect model, face with 2 vertexes: " + line);
                                 }
+
                                 string[] vertexData = tokens[i].Split('/');
                                 int vertexIndex = int.Parse(vertexData[0]) - 1; // Индексы в .obj начинаются с 1
                                 vertices.Add(tempVertices[vertexIndex]);
@@ -150,6 +143,7 @@ namespace Test
 
                                 triangles.Add(vertices.Count - 1);
                             }
+
                             break;
                     }
                 }
@@ -166,21 +160,18 @@ namespace Test
                 if (normals.Count == 0) mesh.RecalculateNormals();
                 mesh.RecalculateBounds();
 
-                GameObject model = new GameObject();
-
-                // Привязка Mesh к объекту
-                MeshFilter meshFilter = model.AddComponent<MeshFilter>();
-                meshFilter.mesh = mesh;
-                
-                Debug.Log($"OBJ файл {modelFile} успешно загружен!");
-
-                return model;
+                return mesh;
             }
-            
-            Debug.LogError($"Файл {modelFile} не найден!");
+            Debug.LogWarning($"Model file not found: {path}");
             return null;
+        }
+
+        [System.Serializable]
+        private class MaterialConfig
+        {
+            public string shader;
+            public float[] color; // RGBA
+            public string texture;
         }
     }
 }
-
-

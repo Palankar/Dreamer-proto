@@ -7,7 +7,7 @@ namespace Test
 {
     public class StreamingAssetsLoader : MonoBehaviour
     {
-        public List<GameObject> LoadTiles(string configPath, string modelsPath, string materialsPath, string iconsPath)
+        public List<GameObject> LoadTiles(string configPath, string modelsPath, string materialsPath, string iconsPath, string objectsPath)
         {
             List<GameObject> loadedTiles = new List<GameObject>();
             string fullPath = Path.Combine(Application.streamingAssetsPath, configPath);
@@ -23,10 +23,10 @@ namespace Test
             
             foreach (var tileConfig in tileConfigs)
             {
-                GameObject model = LoadModel(modelsPath, tileConfig.modelFile);
-                if (model != null)
+                GameObject tile = LoadModel(modelsPath, tileConfig.modelFile);
+                if (tile != null)
                 {
-                    model = Instantiate(model, new Vector3(1000, 0, 1000), Quaternion.identity);
+                    tile = Instantiate(tile, new Vector3(1000, 0, 1000), Quaternion.identity);
                 }
                 else
                 {
@@ -34,21 +34,21 @@ namespace Test
                     continue;
                 }
 
-                model.AddComponent<MeshCollider>();
+                tile.AddComponent<MeshCollider>();
 
                 Material material = FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, tileConfig.materialFile + ".json"));
 
-                MeshRenderer meshRenderer = model.AddComponent<MeshRenderer>();
+                MeshRenderer meshRenderer = tile.AddComponent<MeshRenderer>();
                 meshRenderer.material = material;
                 
                 string iconPath = Path.Combine(Application.streamingAssetsPath, iconsPath, tileConfig.iconFile);
                 Sprite icon = FilesLoader.LoadSpriteFromPath(iconPath);
                 
-                HexTile hexTile = model.AddComponent<HexTile>();
+                HexTile hexTile = tile.AddComponent<HexTile>();
                 hexTile.Sprite = icon;
                 
                 GameObject spawnPosition = new GameObject("SpawnPosition");
-                spawnPosition.transform.parent = model.transform;
+                spawnPosition.transform.parent = tile.transform;
                 spawnPosition.transform.localPosition = new Vector3(
                     tileConfig.spawnPosition[0],
                     tileConfig.spawnPosition[1],
@@ -56,8 +56,26 @@ namespace Test
                 );
 
                 hexTile.spawnPosition = spawnPosition;
+                
+                // Загрузка объектов окружения - камней
+                GameObject stonesParent = new GameObject("Stones");
+                stonesParent.transform.parent = tile.transform;
+                stonesParent.transform.localPosition = Vector3.zero;
+                foreach (var stone in tileConfig.stones)
+                {
+                    LoadEnvironment(objectsPath, stone.modelFile, materialsPath, stone.materialFile, stonesParent, stone.position, 0.2f);
+                }
+                
+                // Загрузка объектов окружения - деревьев
+                GameObject treesParent = new GameObject("Trees");
+                treesParent.transform.parent = tile.transform;
+                treesParent.transform.localPosition = Vector3.zero;
+                foreach (var tree in tileConfig.trees)
+                {
+                    LoadEnvironment(objectsPath, tree.modelFile, materialsPath, tree.materialFile, treesParent, tree.position, 2.0f);
+                }
 
-                loadedTiles.Add(model);
+                loadedTiles.Add(tile);
             }
 
             return loadedTiles;
@@ -68,13 +86,35 @@ namespace Test
             string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath, modelFile);
             Mesh mesh = FilesLoader.LoadObjMeshFromPath(modelPath);
             
-            GameObject model = new GameObject();
+            GameObject model = new GameObject(modelFile.Substring(0, modelFile.LastIndexOf('.')));
 
             // Привязка Mesh к объекту
             MeshFilter meshFilter = model.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
             
             return model;
+        }
+
+        private void LoadEnvironment(string objectsPath, string modelFile, string materialsPath, string materialFile, 
+            GameObject parent, float[] position, float scale)
+        {
+            GameObject envObject = LoadModel(objectsPath, modelFile);
+            
+            envObject.transform.parent = parent.transform;
+            envObject.transform.localPosition = new Vector3(
+                position[0],
+                position[1],
+                position[2]
+            );
+
+            envObject.transform.localScale = new Vector3(scale, scale, scale);
+            
+            envObject.AddComponent<MeshCollider>();
+
+            Material material = FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, materialFile + ".json"));
+
+            MeshRenderer meshRenderer = envObject.AddComponent<MeshRenderer>();
+            meshRenderer.material = material;
         }
     }
 }

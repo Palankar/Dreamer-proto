@@ -9,6 +9,7 @@ namespace Test
         public string modelsPath = "Tiles/Obj/";                // Путь к 3D-моделям
         public string materialsPath = "Materials/";             // Путь к материалам
         public string iconsPath = "UI/";                        // Путь к изображениям
+        public string objectsPath = "Objects/";                 // Путь к объектам окружения
 
         public bool isResources = true;
 
@@ -21,7 +22,7 @@ namespace Test
             {
                 return resourcesLoader.LoadTiles(configPath, modelsPath, materialsPath, iconsPath);
             }
-            return streamingAssetsLoader.LoadTiles(configPath, modelsPath, materialsPath, iconsPath);
+            return streamingAssetsLoader.LoadTiles(configPath, modelsPath, materialsPath, iconsPath, objectsPath);
         }
     }
 
@@ -33,6 +34,15 @@ namespace Test
         public string materialFile;
         public string iconFile;
         public float[] spawnPosition;
+        public EnvObject[] stones;
+        public EnvObject[] trees;
+
+        public class EnvObject
+        {
+            public string modelFile;
+            public float[] position;
+            public string materialFile;
+        }
     }
     
     //TODO: Перенести MonoBehaviour логику сюда, избавив streamingAssetsLoader и resourcesLoader от нее.

@@ -4,6 +4,49 @@
     "modelFile": "Test_1.obj",
     "materialFile": "test",
     "iconFile": "Tile1.png",
-    "spawnPosition": [-0.05, 1.0, -0.05]
+    "spawnPosition": [-0.05, 1.0, -0.05],
+    "stones": [
+      {
+        "modelFile": "Stone_01.obj",
+        "position": [-0.3, 0.0, 2.0],
+        "materialFile": "env"
+      },
+      {
+        "modelFile": "Stone_02.obj",
+        "position": [-0.2, 0.0, -2.5],
+        "materialFile": "env"
+      },
+      {
+        "modelFile": "Stone_03.obj",
+        "position": [2.5, 0.0, -0.6],
+        "materialFile": "env"
+      }
+    ],
+    "trees": [
+      {
+        "modelFile": "Fir_01.obj",
+        "position": [-1.5, 0.0, -2.0],
+        "materialFile": "env"
+      },
+      {
+        "modelFile": "Fir_02.obj",
+        "position": [2.5, 0.0, 1.2],
+        "materialFile": "env"
+      },
+      {
+        "modelFile": "Fir_03.obj",
+        "position": [0.5, 0.0, 3.0],
+        "materialFile": "env"
+      }
+    ]
+  },
+  {
+    "name": "Tile100",
+    "modelFile": "Tile_100.obj",
+    "materialFile": "test",
+    "iconFile": "Tile2.png",
+    "spawnPosition": [-0.05, 1.0, -0.05],
+    "stones": [],
+    "trees": []
   }
 ]

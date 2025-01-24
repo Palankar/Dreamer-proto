@@ -28,6 +28,11 @@ namespace Test
             {
                 ToggleMode();
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ExitGame();
+            }
         }
         
         public void ToggleMode()
@@ -40,6 +45,11 @@ namespace Test
             {
                 SetMode(GameMode.Building);
             }
+        }
+
+        public void ExitGame()
+        {
+            Application.Quit();
         }
         
         public void SetMode(GameMode mode)

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Test.Utilities.Entities;
 using UnityEngine;
 
 namespace Test
@@ -69,14 +70,6 @@ namespace Test
         public static Mesh LoadObjMeshFromPath(string path)
         {
             return ObjParser.Parse(path);
-        }
-
-        [System.Serializable]
-        private class MaterialConfig
-        {
-            public string shader;
-            public float[] color; // RGBA
-            public string texture;
         }
     }
 }

@@ -26,25 +26,6 @@ namespace Test
         }
     }
 
-    [System.Serializable]
-    public class TileConfig
-    {
-        public string name;
-        public string modelFile;
-        public string materialFile;
-        public string iconFile;
-        public float[] spawnPosition;
-        public EnvObject[] stones;
-        public EnvObject[] trees;
-
-        public class EnvObject
-        {
-            public string modelFile;
-            public float[] position;
-            public string materialFile;
-        }
-    }
-    
     //TODO: Перенести MonoBehaviour логику сюда, избавив streamingAssetsLoader и resourcesLoader от нее.
 
 }

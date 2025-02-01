@@ -1,7 +1,7 @@
 ﻿namespace Test.Utilities.Entities
 {
     [System.Serializable]
-    public class TileConfig
+    public partial class TileConfig
     {
         public string name;
         public string modelFile;
@@ -10,12 +10,5 @@
         public float[] spawnPosition;
         public EnvObject[] stones;
         public EnvObject[] trees;
-
-        public class EnvObject
-        {
-            public string modelFile;
-            public float[] position;
-            public string materialFile;
-        }
     }
 }

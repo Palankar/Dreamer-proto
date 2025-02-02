@@ -14,24 +14,23 @@ namespace Test
         public string iconsPath = "UI/";                        // Путь к изображениям
         public string objectsPath = "Objects/";                 // Путь к объектам окружения
 
-        public bool isResources = true;
+        public bool isResources;
 
         private StreamingAssetsLoader _streamingAssetsLoader;
-        public ResourcesLoader resourcesLoader;
+        private ResourcesLoader _resourcesLoader;
 
         private void Start()
         {
             _streamingAssetsLoader = new StreamingAssetsLoader();
+            _resourcesLoader = new ResourcesLoader();
         }
 
         public List<GameObject> LoadTiles()
         {
             if (isResources)
             {
-                //TODO: Переделать также как streamingAssetsLoader
-                return resourcesLoader.LoadTiles(configPath, modelsPath, materialsPath, iconsPath);
+                return LoadTiles(_resourcesLoader);
             }
-
             return LoadTiles(_streamingAssetsLoader);
         }
 
@@ -66,13 +65,13 @@ namespace Test
         {
             tile.AddComponent<MeshCollider>();
 
-            Material material = loader.LoadMaterial(materialsPath, tileConfig);
+            Material material = loader.LoadMaterial(materialsPath, tileConfig.materialFile);
 
             MeshRenderer meshRenderer = tile.AddComponent<MeshRenderer>();
             meshRenderer.material = material;
 
             HexTile hexTile = tile.AddComponent<HexTile>();
-            hexTile.Sprite = loader.LoadIcon(iconsPath, tileConfig);
+            hexTile.Sprite = loader.LoadIcon(iconsPath, tileConfig.iconFile);
 
             GameObject spawnPosition = new GameObject("SpawnPosition");
             spawnPosition.transform.parent = tile.transform;
@@ -106,7 +105,4 @@ namespace Test
             }
         }
     }
-
-    //TODO: Перенести MonoBehaviour логику сюда, избавив и resourcesLoader от нее
-    //TODO: Вынести все назначения компонентов и подвязку parent к объекту тайла
 }

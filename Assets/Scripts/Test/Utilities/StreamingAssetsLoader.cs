@@ -30,14 +30,14 @@ namespace Test
             return model;
         }
 
-        public Material LoadMaterial(string materialsPath, TileConfig tileConfig)
+        public Material LoadMaterial(string materialsPath, string materialFile)
         {
-            return FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, tileConfig.materialFile + ".json"));
+            return FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, materialFile + ".json"));
         }
 
-        public Sprite LoadIcon(string iconsPath, TileConfig tileConfig)
+        public Sprite LoadIcon(string iconsPath, string iconFile)
         {
-            string iconPath = Path.Combine(GetPath(), iconsPath, tileConfig.iconFile);
+            string iconPath = Path.Combine(GetPath(), iconsPath, iconFile);
             return FilesLoader.LoadSpriteFromPath(iconPath);
         }
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Test.Configs;
 using Test.Utilities.Entities;
 using UnityEngine;
 
@@ -8,35 +9,11 @@ namespace Test
 {
     public class TileLoader : MonoBehaviour
     {
-        public string configPath = "Configs/tiles_config.json"; // Путь к файлу конфигурации
-        public string modelsPath = "Tiles/Obj/";                // Путь к 3D-моделям
-        public string materialsPath = "Materials/";             // Путь к материалам
-        public string iconsPath = "UI/";                        // Путь к изображениям
-        public string objectsPath = "Objects/";                 // Путь к объектам окружения
-
-        public bool isResources;
-
-        private StreamingAssetsLoader _streamingAssetsLoader;
-        private ResourcesLoader _resourcesLoader;
-
-        private void Start()
-        {
-            _streamingAssetsLoader = new StreamingAssetsLoader();
-            _resourcesLoader = new ResourcesLoader();
-        }
+        public LoaderManager loaderManager;
 
         public List<GameObject> LoadTiles()
         {
-            if (isResources)
-            {
-                return LoadTiles(_resourcesLoader);
-            }
-            return LoadTiles(_streamingAssetsLoader);
-        }
-
-        private List<GameObject> LoadTiles(LoaderInt loader)
-        {
-            string fullPath = Path.Combine(Application.streamingAssetsPath, configPath);
+            string fullPath = Path.Combine(Application.streamingAssetsPath, PathConfig.ConfigPath);
 
             if (!File.Exists(fullPath))
             {
@@ -50,9 +27,10 @@ namespace Test
             List<GameObject> loadedTiles = new List<GameObject>();
             foreach (TileConfig tileConfig in tileConfigs)
             {
-                GameObject tile = _streamingAssetsLoader.LoadModel(modelsPath, tileConfig.modelFile);
+                GameObject tile = loaderManager.GetLoader().LoadModel(PathConfig.TilesPath, tileConfig.modelFile);
+                tile.transform.position = new Vector3(100, 0, 100);
 
-                SetTileComponents(loader, ref tile, tileConfig);
+                SetTileComponents(loaderManager.GetLoader(), ref tile, tileConfig);
                 
                 loadedTiles.Add(tile);
             }
@@ -65,13 +43,14 @@ namespace Test
         {
             tile.AddComponent<MeshCollider>();
 
-            Material material = loader.LoadMaterial(materialsPath, tileConfig.materialFile);
+            Material material = loader.LoadMaterial(tileConfig.materialFile);
 
             MeshRenderer meshRenderer = tile.AddComponent<MeshRenderer>();
             meshRenderer.material = material;
 
             HexTile hexTile = tile.AddComponent<HexTile>();
-            hexTile.Sprite = loader.LoadIcon(iconsPath, tileConfig.iconFile);
+            hexTile.Sprite = loader.LoadIcon(tileConfig.iconFile);
+            hexTile.TileConfig = tileConfig;
 
             GameObject spawnPosition = new GameObject("SpawnPosition");
             spawnPosition.transform.parent = tile.transform;
@@ -82,27 +61,7 @@ namespace Test
             );
 
             hexTile.spawnPosition = spawnPosition;
-
-            //TODO: Иерархия parent объектов: Environment -> Trees, Stones, etc
-            // Загрузка объектов окружения - камней
-            GameObject stonesParent = new GameObject("Stones");
-            stonesParent.transform.parent = tile.transform;
-            stonesParent.transform.localPosition = Vector3.zero;
-            foreach (var stone in tileConfig.stones)
-            {
-                loader.LoadEnvironment(objectsPath, stone.modelFile, materialsPath, stone.materialFile, stonesParent,
-                    stone.position, 0.2f);
-            }
-
-            // Загрузка объектов окружения - деревьев
-            GameObject treesParent = new GameObject("Trees");
-            treesParent.transform.parent = tile.transform;
-            treesParent.transform.localPosition = Vector3.zero;
-            foreach (var tree in tileConfig.trees)
-            {
-                loader.LoadEnvironment(objectsPath, tree.modelFile, materialsPath, tree.materialFile, treesParent,
-                    tree.position, 2.0f);
-            }
         }
+
     }
 }

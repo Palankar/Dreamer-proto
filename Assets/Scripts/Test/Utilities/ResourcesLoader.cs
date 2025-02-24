@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.IO;
+using Test.Configs;
 using Test.Utilities.Entities;
 using UnityEngine;
 
@@ -13,27 +13,22 @@ namespace Test
             return Resources.Load<GameObject>(modelPath);
         }
 
-        public Material LoadMaterial(string materialsPath, string materialFile)
+        public Material LoadMaterial(string materialFile)
         {
-            string materialPath = Path.Combine(materialsPath, materialFile);
+            string materialPath = Path.Combine(PathConfig.MaterialsPath, materialFile);
             return Resources.Load<Material>(materialPath);
         }
 
-        public Sprite LoadIcon(string iconsPath, string iconFile)
+        public Sprite LoadIcon(string iconFile)
         {
-            string iconPath = Path.Combine(iconsPath, iconFile);
+            string iconPath = Path.Combine(PathConfig.IconsPath, iconFile);
             return Resources.Load<Sprite>(iconPath);
         }
 
-        public void LoadEnvironment(string objectsPath, string modelFile, string materialsPath, string materialFile,
-            GameObject parent, float[] position, float scale)
+        public void LoadEnvironment(GameObject parent, TileConfig.EnvObject[] envObjects,
+            EnvironmentLoader environmentLoader)
         {
             
-        }
-
-        public List<GameObject> LoadEnvironment(string objectsPath, TileConfig config)
-        {
-            return new List<GameObject>();
         }
 
         public string GetPath()

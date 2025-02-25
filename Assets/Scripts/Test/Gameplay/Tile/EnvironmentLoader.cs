@@ -9,17 +9,24 @@ namespace Test
 {
     public class EnvironmentLoader : MonoBehaviour
     {
-        public string surfaceLayer;     // Слой поверхности
-        public string checkLayer;       // Слой объектов, которые нужно проверять
-        public LoaderManager loaderManager;
+        public string surfaceLayer;             // Слой поверхности
+        public string checkLayer;               // Слой объектов, которые нужно проверять
+        public LoaderManager loaderManager;     // Менеджер загрузки 3d моделей 
 
         public int maxAttempts; // Количество попыток найти позицию
 
         private LoaderInt _loader;
 
+        private int _surfaceLayerMask;
+        private int _checkLayerMask;
+        
+        private Collider[] _overlapResults = new Collider[1];
+
         private void Awake()
         {
             _loader = loaderManager.GetLoader();
+            _surfaceLayerMask = LayerMask.GetMask(surfaceLayer);
+            _checkLayerMask = LayerMask.GetMask(checkLayer);
         }
 
         public List<GameObject> SpawnObjects(TileConfig.EnvObject envObject, GameObject parent)
@@ -33,45 +40,26 @@ namespace Test
 
             for (int i = 0; i < envObject.density; i++)
             {
-                Vector3 randomPosition = Vector3.zero;
-                bool validPositionFound = false;
+                Vector3 candidatePosition = Vector3.zero;
 
                 // Пытаемся найти допустимую позицию
-                for (int attempt = 0; attempt < maxAttempts; attempt++)
-                {
-                    // Генерация случайной позиции в радиусе
-                    Vector3 randomOffset = Random.insideUnitSphere * envObject.spawnRadius;
-                    randomOffset.y = 0; // Убираем смещение по оси Y
-                    randomPosition = spawnPoint + randomOffset + Vector3.up;
+                bool validPositionFound = TryFindValidPosition(candidatePosition, envObject.spawnRadius, envObject.checkRadius, out candidatePosition);
 
-                    // Проверка объектов в радиусе новой позиции
-                    if (Physics.OverlapCapsule(randomPosition,
-                            new Vector3(randomPosition.x, randomPosition.y - 20, randomPosition.z),
-                            envObject.checkRadius,
-                            LayerMask.GetMask(checkLayer)).Length == 0)
-                    {
-                        validPositionFound = true;
-                        break;
-                    }
-                }
-                
                 // Если найдена допустимая позиция, Raycast вниз для нахождения поверхности
-                if (validPositionFound && Physics.Raycast(randomPosition, Vector3.down, out RaycastHit hit,
-                        100f, LayerMask.GetMask(surfaceLayer)))
+                if (validPositionFound && Physics.Raycast(candidatePosition, Vector3.down, out RaycastHit hit,
+                        100f, _surfaceLayerMask))
                 {
-                    // Определяем наклон нормали поверхности
-                    Quaternion normalSlope = Quaternion.FromToRotation(Vector3.up, hit.normal);
-
+                    // Определяем угол наклана поверхности
+                    float angle = Vector3.Angle(hit.normal, Vector3.up);
+                    
                     // Пропускаем, если поверхность постановки слишком наклонная
-                    if (envObject.isVertical &&
-                        (Math.Abs(normalSlope.x) > 0.35f || Math.Abs(normalSlope.z) > 0.35f ||
-                         Math.Abs(normalSlope.y) > 0.35f))
+                    if (envObject.isVertical && angle > 20f) // Порог (например, 20 градусов) можно настроить
                     {
                         continue;
                     }
-                    
+
                     //Выбираем случайную модель из списка
-                    int randomModelIndex = Random.Range(0, envObject.modelVariants.Length - 1);
+                    int randomModelIndex = Random.Range(0, envObject.modelVariants.Length);
                     string modelFile = envObject.modelVariants[randomModelIndex];
 
                     // Загружаем объект
@@ -82,7 +70,7 @@ namespace Test
                     obj.transform.position = hit.point;
 
                     // Выравниваем объект относительно нормали поверхности
-                    obj.transform.rotation = normalSlope;
+                    obj.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
 
                     // Логика для свободных и вертикальных объектов
                     if (envObject.isVertical)
@@ -111,6 +99,34 @@ namespace Test
                 }
             }
             return spawnedObjects;
+        }
+        
+        private bool TryFindValidPosition(Vector3 spawnPoint, float spawnRadius, float checkRadius, out Vector3 position)
+        {
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                // Генерация случайной позиции в радиусе
+                Vector3 randomOffset = Random.insideUnitSphere * spawnRadius;
+                randomOffset.y = 0;
+                Vector3 candidatePosition = spawnPoint + randomOffset + Vector3.up;
+
+                // Проверка объектов в радиусе новой позиции
+                int hitCount = Physics.OverlapCapsuleNonAlloc(
+                    candidatePosition, 
+                    new Vector3(candidatePosition.x, candidatePosition.y - 20, candidatePosition.z), 
+                    checkRadius, 
+                    _overlapResults, 
+                    _checkLayerMask);
+                
+                // Если пересечений не найдено - позиция верная
+                if (hitCount == 0)
+                {
+                    position = candidatePosition;
+                    return true;
+                }
+            }
+            position = Vector3.zero;
+            return false;
         }
     }
 }

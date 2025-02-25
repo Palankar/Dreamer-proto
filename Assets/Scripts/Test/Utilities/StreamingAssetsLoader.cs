@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Test.Configs;
 using Test.Utilities.Entities;
 using UnityEngine;
 
@@ -7,15 +8,6 @@ namespace Test
 {
     public class StreamingAssetsLoader : LoaderInt
     {
-        public List<GameObject> LoadEnvironment(string objectsPath, TileConfig config)
-        {
-            EnvironmentLoader environmentLoader = new EnvironmentLoader();
-            
-            
-            
-            return null;
-        }
-
         public GameObject LoadModel(string modelsPath, string modelFile)
         {
             string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath, modelFile);
@@ -30,14 +22,14 @@ namespace Test
             return model;
         }
 
-        public Material LoadMaterial(string materialsPath, string materialFile)
+        public Material LoadMaterial(string materialFile)
         {
-            return FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, materialFile + ".json"));
+            return FilesLoader.LoadMaterialFromConfig(Path.Combine(PathConfig.MaterialsPath, materialFile + ".json"));
         }
 
-        public Sprite LoadIcon(string iconsPath, string iconFile)
+        public Sprite LoadIcon(string iconFile)
         {
-            string iconPath = Path.Combine(GetPath(), iconsPath, iconFile);
+            string iconPath = Path.Combine(GetPath(), PathConfig.IconsPath, iconFile);
             return FilesLoader.LoadSpriteFromPath(iconPath);
         }
 
@@ -46,28 +38,22 @@ namespace Test
             return Application.streamingAssetsPath;
         }
 
-        public void LoadEnvironment(string objectsPath, string modelFile, string materialsPath, string materialFile,
-            GameObject parent, float[] position, float scale)
+        public void LoadEnvironment(GameObject parent, TileConfig.EnvObject[] envObjects, EnvironmentLoader environmentLoader)
         {
-            GameObject envObject = LoadModel(objectsPath, modelFile);
-
-            envObject.transform.parent = parent.transform;
-            envObject.transform.localPosition = new Vector3(
-                position[0],
-                position[1],
-                position[2]
-            );
-
-            envObject.transform.localScale = new Vector3(scale, scale, scale);
-
-            envObject.AddComponent<MeshCollider>();
-
-            Material material = FilesLoader.LoadMaterialFromConfig(Path.Combine(materialsPath, materialFile + ".json"));
-
-            MeshRenderer meshRenderer = envObject.AddComponent<MeshRenderer>();
-            meshRenderer.material = material;
+            foreach (var envObject in envObjects)
+            {
+                List<GameObject> spawnedObjects = environmentLoader.SpawnObjects(envObject, parent);
+                
+                Material material = FilesLoader.LoadMaterialFromConfig(Path.Combine(PathConfig.MaterialsPath, envObject.materialFile + ".json"));
+                
+                foreach (GameObject spawnedObject in spawnedObjects)
+                {
+                    spawnedObject.AddComponent<MeshCollider>();
+                    
+                    MeshRenderer meshRenderer = spawnedObject.AddComponent<MeshRenderer>();
+                    meshRenderer.material = material;
+                }
+            }
         }
-
-        //TODO: Вынести подгрузку окружения в отдельный метод
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Test.Utilities.Entities;
+﻿using Test.Utilities.Entities;
 using UnityEngine;
 
 namespace Test
@@ -8,14 +7,11 @@ namespace Test
     {
         public GameObject LoadModel(string modelsPath, string modelFile);
 
-        public Material LoadMaterial(string materialsPath, string materialFile);
+        public Material LoadMaterial(string materialFile);
 
-        public Sprite LoadIcon(string iconsPath, string iconFile);
-
-        public List<GameObject> LoadEnvironment(string objectsPath, TileConfig config);
+        public Sprite LoadIcon(string iconFile);
         
-        public void LoadEnvironment(string objectsPath, string modelFile, string materialsPath, string materialFile,
-            GameObject parent, float[] position, float scale);
+        public void LoadEnvironment(GameObject parent, TileConfig.EnvObject[] envObjects, EnvironmentLoader environmentLoader);
 
         public string GetPath();
     }

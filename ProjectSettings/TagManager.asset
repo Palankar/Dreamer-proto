@@ -13,8 +13,8 @@ TagManager:
   - UI
   - hexLayer
   - Environment
-  - 
-  - 
+  - TileLayer
+  - SurfaceLayer
   - 
   - 
   - 

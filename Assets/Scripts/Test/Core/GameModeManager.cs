@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Test
 {
     public class GameModeManager : MonoBehaviour
     {
         public Camera mainCamera;
-        public HexPlacementManager hexPlacementManager;
+        public TilePlacementManager tilePlacementManager;
 
         public enum GameMode { Building, CharacterControl }
 
@@ -78,7 +79,7 @@ namespace Test
                     tileSelectionUI.SetActive(false);
                     
                     // Перемещаем персонажа в центре первого тайла
-                    Vector3 spawnPosition = hexPlacementManager.GetFirstPlacedTileSpawnPosition();
+                    Vector3 spawnPosition = tilePlacementManager.GetFirstPlacedTileSpawnPosition();
                     player.transform.position = spawnPosition;// + new Vector3(0, 1, 0); // Смещаем над тайлом;
                     
                     player.SetActive(true);

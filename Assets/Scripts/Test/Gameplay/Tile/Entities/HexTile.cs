@@ -1,3 +1,4 @@
+using Test.Utilities.Entities;
 using UnityEngine;
 
 namespace Test
@@ -10,5 +11,7 @@ namespace Test
         public GameObject spawnPosition;
 
         public Sprite Sprite; // Изображение тайла
+
+        public TileConfig TileConfig; // Конфигурация тайла
     }
 }

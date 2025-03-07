@@ -5,40 +5,66 @@
     "materialFile": "test",
     "iconFile": "Tile1.png",
     "spawnPosition": [-0.05, 1.0, -0.05],
-    "stones": [
-      {
-        "modelFile": "Stone_01.obj",
-        "position": [-0.3, 0.0, 2.0],
-        "materialFile": "env"
-      },
-      {
-        "modelFile": "Stone_02.obj",
-        "position": [-0.2, 0.0, -2.5],
-        "materialFile": "env"
-      },
-      {
-        "modelFile": "Stone_03.obj",
-        "position": [2.5, 0.0, -0.6],
-        "materialFile": "env"
-      }
-    ],
-    "trees": [
-      {
-        "modelFile": "Fir_01.obj",
-        "position": [-1.5, 0.0, -2.0],
-        "materialFile": "env"
-      },
-      {
-        "modelFile": "Fir_02.obj",
-        "position": [2.5, 0.0, 1.2],
-        "materialFile": "env"
-      },
-      {
-        "modelFile": "Fir_03.obj",
-        "position": [0.5, 0.0, 3.0],
-        "materialFile": "env"
-      }
-    ]
+    "environment": {
+      "stones": [
+        {
+          "modelVariants": ["Stone_01.obj", "Stone_02.obj"],
+          "position": [-0.3, 0.0, 2.0],
+          "materialFile": "env",
+          "density": 3,
+          "spawnRadius": 1.5,
+          "checkRadius": 0.5,
+          "isVertical": false
+        },
+        {
+          "modelVariants": ["Stone_01.obj", "Stone_02.obj"],
+          "position": [-0.2, 0.0, -2.5],
+          "materialFile": "env",
+          "density": 3,
+          "spawnRadius": 1.5,
+          "checkRadius": 0.5,
+          "isVertical": false
+        },
+        {
+          "modelVariants": ["Stone_03.obj"],
+          "position": [2.5, 0.0, -0.6],
+          "materialFile": "env",
+          "density": 3,
+          "spawnRadius": 1.5,
+          "checkRadius": 0.5,
+          "isVertical": false
+        }
+      ],
+      "trees": [
+        {
+          "modelVariants": ["Fir_01.obj", "Fir_02.obj"],
+          "position": [-1.5, 0.0, -2.0],
+          "materialFile": "env",
+          "density": 7,
+          "spawnRadius": 1.5,
+          "checkRadius": 0.5,
+          "isVertical": true
+        },
+        {
+          "modelVariants": ["Fir_01.obj", "Fir_02.obj"],
+          "position": [2.5, 0.0, 1.2],
+          "materialFile": "env",
+          "density": 7,
+          "spawnRadius": 1.5,
+          "checkRadius": 0.5,
+          "isVertical": true
+        },
+        {
+          "modelVariants": ["Fir_03.obj"],
+          "position": [0.5, 0.0, 3.0],
+          "materialFile": "env",
+          "density": 7,
+          "spawnRadius": 1.5,
+          "checkRadius": 0.5,
+          "isVertical": true
+        }
+      ]
+    }
   },
   {
     "name": "Tile100",
@@ -46,7 +72,9 @@
     "materialFile": "test",
     "iconFile": "Tile2.png",
     "spawnPosition": [-0.05, 1.0, -0.05],
-    "stones": [],
-    "trees": []
+    "environment": {
+      "stones": [],
+      "trees": []
+    }
   }
 ]

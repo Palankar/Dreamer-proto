@@ -948,7 +948,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 1115525156}
-  tilePlacementManager: {fileID: 0}
+  tilePlacementManager: {fileID: 509830256}
   hexGrid: {fileID: 991922839}
   tileSelectionUI: {fileID: 2036910027}
   player: {fileID: 974684169}

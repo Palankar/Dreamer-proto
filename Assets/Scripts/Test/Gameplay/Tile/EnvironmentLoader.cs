@@ -20,7 +20,7 @@ namespace Test
         private int _surfaceLayerMask;
         private int _checkLayerMask;
         
-        private Collider[] _overlapResults = new Collider[1];
+        private readonly Collider[] _overlapResults = new Collider[1];
 
         private void Awake()
         {
@@ -43,7 +43,7 @@ namespace Test
                 Vector3 candidatePosition = Vector3.zero;
 
                 // Пытаемся найти допустимую позицию
-                bool validPositionFound = TryFindValidPosition(candidatePosition, envObject.spawnRadius, envObject.checkRadius, out candidatePosition);
+                bool validPositionFound = TryFindValidPosition(spawnPoint, envObject.spawnRadius, envObject.checkRadius, out candidatePosition);
 
                 // Если найдена допустимая позиция, Raycast вниз для нахождения поверхности
                 if (validPositionFound && Physics.Raycast(candidatePosition, Vector3.down, out RaycastHit hit,

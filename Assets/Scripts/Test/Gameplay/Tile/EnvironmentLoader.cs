@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Test.Configs;
 using Test.Utilities.Entities;
 using UnityEngine;
@@ -7,6 +6,9 @@ using Random = UnityEngine.Random;
 
 namespace Test
 {
+    /**
+     * Загрузчик объектов окружения.
+     */
     public class EnvironmentLoader : MonoBehaviour
     {
         public string surfaceLayer;             // Слой поверхности
@@ -24,6 +26,11 @@ namespace Test
 
         private void Awake()
         {
+            if (loaderManager == null) Debug.LogError("LoaderManager не назначен!");
+            
+            if (string.IsNullOrEmpty(surfaceLayer)) Debug.LogError("SurfaceLayer не задан!");
+            if (string.IsNullOrEmpty(checkLayer)) Debug.LogError("CheckLayer не задан!");
+            
             _loader = loaderManager.GetLoader();
             _surfaceLayerMask = LayerMask.GetMask(surfaceLayer);
             _checkLayerMask = LayerMask.GetMask(checkLayer);

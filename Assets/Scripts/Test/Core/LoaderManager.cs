@@ -3,6 +3,9 @@ using UnityEngine.Serialization;
 
 namespace Test
 {
+    /**
+     * Менеджер загрузки внешних файлов.
+     */
     public class LoaderManager : MonoBehaviour
     {
         private enum LoaderType
@@ -24,6 +27,9 @@ namespace Test
                     break;
                 case LoaderType.Resources:
                     _loader = new ResourcesLoader();
+                    break;
+                default:
+                    Debug.LogError($"Неизвестный тип загрузчика: {loaderType}");
                     break;
             }
         }

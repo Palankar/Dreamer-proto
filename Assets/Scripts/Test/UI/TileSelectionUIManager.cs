@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace Test
 {
+    /**
+     * Менеджер визуального интерфейса.
+     */
     public class TileSelectionUIManager : MonoBehaviour
     {
         public Transform buttonContainer; // Контейнер для кнопок (например, Panel)
@@ -15,6 +18,13 @@ namespace Test
 
         private int _selectedTileIndex = -1; // Индекс выбранного тайла (-1, если не выбран)
 
+        void Awake()
+        {
+            if (buttonContainer == null) Debug.LogError("ButtonContainer не назначен!");
+            if (buttonPrefab == null) Debug.LogError("ButtonPrefab не назначен!");
+            if (tileLoaderManager == null) Debug.LogError("TileLoaderManager не назначен!");
+        }
+        
         void Start()
         {
             _tileLoader = tileLoaderManager.GetComponent<TileLoader>();

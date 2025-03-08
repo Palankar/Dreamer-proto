@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Объект тайла.
+     */
     public class HexTile : MonoBehaviour
     {
         public int Q; // Axial координата

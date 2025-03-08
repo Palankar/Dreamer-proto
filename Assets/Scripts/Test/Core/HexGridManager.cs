@@ -2,12 +2,21 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Менеджер координатной гексагональной сетки.
+     */
     public class HexGridManager : MonoBehaviour
     {
         public GameObject hexGrid;
         public GameObject hexPrefab; // Префаб гекса
         public int gridRadius = 5; // Радиус сетки
         public float hexSize = 1f; // Размер гекса
+        
+        void Awake()
+        {
+            if (hexPrefab == null) Debug.LogError("HexPrefab не назначен!");
+            if (hexGrid == null) Debug.LogError("HexGrid не назначен!");
+        }
 
         void Start()
         {

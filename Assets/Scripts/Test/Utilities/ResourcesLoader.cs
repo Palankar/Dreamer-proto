@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Загрузчик объектов из ресурсов.
+     */
     public class ResourcesLoader : LoaderInt
     {
         public GameObject LoadModel(string modelsPath, string modelFile)

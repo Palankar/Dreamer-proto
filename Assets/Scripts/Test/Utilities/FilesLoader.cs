@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Загрузчик внешних файлов.
+     */
     public static class FilesLoader
     {
         public static Material LoadMaterialFromConfig(string configFilePath)
@@ -19,6 +22,7 @@ namespace Test
             // Чтение конфигурации
             string jsonContent = File.ReadAllText(fullPath);
             MaterialConfig config = JsonUtility.FromJson<MaterialConfig>(jsonContent);
+            config.Validate();
 
             // Создание материала
             Shader shader = Shader.Find(config.shader);

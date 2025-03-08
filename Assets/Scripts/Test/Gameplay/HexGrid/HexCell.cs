@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Объект ячейки координатной сетки.
+     */
     public class HexCell : MonoBehaviour
     {
         private Renderer _renderer; // Ссылка на Renderer ячейки

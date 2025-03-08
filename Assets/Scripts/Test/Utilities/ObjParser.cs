@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Парсер OBJ объекта в Mesh.
+     */
     public class ObjParser
     {
         /// <summary>

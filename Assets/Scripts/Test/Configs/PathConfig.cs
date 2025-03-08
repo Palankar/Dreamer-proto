@@ -1,5 +1,8 @@
 ﻿namespace Test.Configs
 {
+    /**
+     * Конфигурация путей к внешним файлам.
+     */
     public static class PathConfig
     {
         public static readonly string ConfigPath = "Configs/tiles_config.json";     // Путь к файлу конфигурации

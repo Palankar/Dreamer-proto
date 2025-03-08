@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Базовый контроллер камеры.
+     */
     public class CameraController : MonoBehaviour
     {
         public float moveSpeed = 15f; // Скорость движения камеры

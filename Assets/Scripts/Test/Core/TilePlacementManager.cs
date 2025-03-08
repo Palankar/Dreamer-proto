@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Test.Utilities.Entities;
 using UnityEngine;
@@ -5,6 +6,9 @@ using UnityEngine.EventSystems;
 
 namespace Test
 {
+    /**
+     * Менеджер установки тайлов на координатную сетку.
+     */
     public class TilePlacementManager : MonoBehaviour
     {
         public TileSelectionUIManager tileSelectionUIManager; // Управление UI размещения тайлов
@@ -19,7 +23,14 @@ namespace Test
         private List<GameObject> _placedTiles = new();
         
         [SerializeField] private GameModeManager gameModeManager;
-        
+
+        private void Awake()
+        {
+            if (tileSelectionUIManager == null) Debug.LogError("TileSelectionUIManager не назначена!");
+            if (environmentLoader == null) Debug.LogError("EnvironmentLoader не назначена!");
+            if (loaderManager == null) Debug.LogError("LoaderManager не назначена!");
+        }
+
         private void Update()
         {
             if (gameModeManager.GetCurrentMode() != GameModeManager.GameMode.Building)

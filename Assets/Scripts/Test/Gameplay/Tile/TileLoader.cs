@@ -7,9 +7,17 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Загрузчик тайлов.
+     */
     public class TileLoader : MonoBehaviour
     {
         public LoaderManager loaderManager;
+
+        private void Awake()
+        {
+            if (loaderManager == null) Debug.LogError("LoaderManager не назначен!");
+        }
 
         public List<GameObject> LoadTiles()
         {
@@ -23,19 +31,25 @@ namespace Test
 
             string jsonContent = File.ReadAllText(fullPath);
             List<TileConfig> tileConfigs = JsonConvert.DeserializeObject<List<TileConfig>>(jsonContent);
-
-            List<GameObject> loadedTiles = new List<GameObject>();
-            foreach (TileConfig tileConfig in tileConfigs)
+            if (tileConfigs != null)
             {
-                GameObject tile = loaderManager.GetLoader().LoadModel(PathConfig.TilesPath, tileConfig.modelFile);
-                tile.transform.position = new Vector3(100, 0, 100);
+                tileConfigs.ForEach(config => config.Validate());
 
-                SetTileComponents(loaderManager.GetLoader(), ref tile, tileConfig);
-                
-                loadedTiles.Add(tile);
+                List<GameObject> loadedTiles = new List<GameObject>();
+                foreach (TileConfig tileConfig in tileConfigs)
+                {
+                    GameObject tile = loaderManager.GetLoader().LoadModel(PathConfig.TilesPath, tileConfig.modelFile);
+                    tile.transform.position = new Vector3(100, 0, 100);
+
+                    SetTileComponents(loaderManager.GetLoader(), ref tile, tileConfig);
+
+                    loadedTiles.Add(tile);
+                }
+
+                return loadedTiles;
             }
-
-            return loadedTiles;
+            Debug.LogError("Конфигурации тайлов не были десериализованы!");
+            return null;
         }
 
 

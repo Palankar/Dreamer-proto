@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Загрузчик объектов из StreamingAssets.
+     */
     public class StreamingAssetsLoader : LoaderInt
     {
         public GameObject LoadModel(string modelsPath, string modelFile)
@@ -13,7 +16,7 @@ namespace Test
             string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath, modelFile);
             Mesh mesh = FilesLoader.LoadObjMeshFromPath(modelPath);
 
-            GameObject model = new GameObject(modelFile.Substring(0, modelFile.LastIndexOf('.')));
+            GameObject model = new GameObject(Path.GetFileNameWithoutExtension(modelFile));
 
             // Привязка Mesh к объекту
             MeshFilter meshFilter = model.AddComponent<MeshFilter>();

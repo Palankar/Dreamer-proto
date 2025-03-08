@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Базовый контроллер управления персонажем.
+     */
     [RequireComponent(typeof(CharacterController))]
     public class SimpleMovementCharacterController : MonoBehaviour
     {
@@ -11,6 +14,11 @@ namespace Test
         
         [SerializeField] private GameModeManager gameModeManager;
 
+        void Awake()
+        {
+            if (gameModeManager == null) Debug.LogError("GameModeManager не назначен!");
+        }
+        
         void Start()
         {
             _controller = GetComponent<CharacterController>();

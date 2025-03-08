@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Контроллер управления персонажем (с учетом гравитации).
+     */
     [RequireComponent(typeof(CharacterController))]
     public class MovementCharacterController : MonoBehaviour
     {

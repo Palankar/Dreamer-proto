@@ -1,9 +1,11 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Test
 {
+    /**
+     * Менеджер управления режимами.
+     */
     public class GameModeManager : MonoBehaviour
     {
         public Camera mainCamera;
@@ -17,6 +19,15 @@ namespace Test
         [SerializeField] private GameObject ui;
         
         private GameMode _currentMode;
+        private Transform _mainCameraTransform;
+
+        private void Awake()
+        {
+            if (tilePlacementManager == null) Debug.LogError("TilePlacementManager не назначен!");
+            if (mainCamera == null) Debug.LogError("MainCamera не назначена!");
+            
+            _mainCameraTransform = mainCamera.transform;
+        }
 
         private void Start()
         {
@@ -56,7 +67,6 @@ namespace Test
         public void SetMode(GameMode mode)
         {
             _currentMode = mode;
-            Transform mainCameraTransform = mainCamera.transform;
 
             switch (_currentMode)
             {
@@ -66,11 +76,11 @@ namespace Test
                     tileSelectionUI.SetActive(true);
                     player.SetActive(false);
 
-                    mainCameraTransform.SetParent(null);
+                    _mainCameraTransform.SetParent(null);
                     
                     // Смещаем камеру над сеткой
-                    mainCameraTransform.position = new Vector3(0, 30, -5);
-                    mainCameraTransform.rotation = Quaternion.Euler(70, 0, 0);
+                    _mainCameraTransform.position = new Vector3(0, 30, -5);
+                    _mainCameraTransform.rotation = Quaternion.Euler(70, 0, 0);
                     break;
 
                 case GameMode.CharacterControl:
@@ -85,9 +95,9 @@ namespace Test
                     player.SetActive(true);
 
                     // Смещаем камеру над персонажем
-                    mainCameraTransform.SetParent(player.transform);
-                    mainCameraTransform.localPosition = new Vector3(0, 10, -10);
-                    mainCameraTransform.localRotation = Quaternion.Euler(45, 0, 0);
+                    _mainCameraTransform.SetParent(player.transform);
+                    _mainCameraTransform.localPosition = new Vector3(0, 10, -10);
+                    _mainCameraTransform.localRotation = Quaternion.Euler(45, 0, 0);
                     break;
             }
         }

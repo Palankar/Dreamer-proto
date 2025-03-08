@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Test
 {
+    /**
+     * Генератор гексагона для ячейки координатной сетки.
+     */
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class HexagonMeshGenerator : MonoBehaviour
     {

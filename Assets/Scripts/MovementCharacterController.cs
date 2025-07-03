@@ -8,7 +8,7 @@ namespace Test
         public float moveSpeed = 0.5f; // Скорость движения
         public float gravity = -9.81f; // Гравитация
         
-        private Vector3 velocity;      // Скорость падения
+        private Vector3 _velocity;      // Скорость падения
         private CharacterController _characterController;
         
         [SerializeField] private GameModeManager gameModeManager;
@@ -26,11 +26,11 @@ namespace Test
             // Применяем гравитацию
             if (!_characterController.isGrounded)
             {
-                velocity.y += gravity * Time.fixedDeltaTime;
+                _velocity.y += gravity * Time.fixedDeltaTime;
             }
             else
             {
-                velocity.y = 0f; // Обнуляем скорость падения на земле
+                _velocity.y = 0f; // Обнуляем скорость падения на земле
             }
             
             // Получаем входные данные
@@ -45,7 +45,7 @@ namespace Test
                 Vector3 move = direction * moveSpeed;
 
                 // Двигаем персонажа с учетом гравитации
-                _characterController.Move((move + velocity) * Time.fixedDeltaTime);
+                _characterController.Move((move + _velocity) * Time.fixedDeltaTime);
             }
         }
     }

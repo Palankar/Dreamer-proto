@@ -1,0 +1,30 @@
+﻿[
+  {
+    "name": "Mount_1",
+    "modelFile": "Mount_1.fbx",
+    "materialFile": "Placed.mat",
+    "iconFile": "Mount1.png",
+    "spawnPosition": [2.3, 1.0, -0.3]
+  },
+  {
+    "name": "Tile1",
+    "modelFile": "Tile_1.fbx",
+    "materialFile": "Placed.mat",
+    "iconFile": "Tile1.png",
+    "spawnPosition": [-0.05, 1.0, -0.05]
+  },
+  {
+    "name": "Tile2",
+    "modelFile": "Tile_2.fbx",
+    "materialFile": "Placed.mat",
+    "iconFile": "Tile2.png",
+    "spawnPosition": [-0.25, 1.0, 0.035]
+  },
+  {
+    "name": "Tile3",
+    "modelFile": "Tile_3.fbx",
+    "materialFile": "Placed.mat",
+    "iconFile": "Tile3.png",
+    "spawnPosition": [0.005, 1.0, -0.035]
+  }
+]

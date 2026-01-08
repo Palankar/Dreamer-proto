@@ -11,7 +11,7 @@ namespace Test
         public Camera mainCamera;
         public TilePlacementManager tilePlacementManager;
 
-        public enum GameMode { Building, CharacterControl }
+        public enum GameMode { Building, CharacterControl, FreeFlying }
 
         [SerializeField] private GameObject hexGrid;
         [SerializeField] private GameObject tileSelectionUI;
@@ -52,6 +52,10 @@ namespace Test
             if (_currentMode == GameMode.Building)
             {
                 SetMode(GameMode.CharacterControl);
+            }
+            else if (_currentMode == GameMode.CharacterControl)
+            {
+                SetMode(GameMode.FreeFlying);
             }
             else
             {
@@ -98,6 +102,16 @@ namespace Test
                     _mainCameraTransform.SetParent(player.transform);
                     _mainCameraTransform.localPosition = new Vector3(0, 10, -10);
                     _mainCameraTransform.localRotation = Quaternion.Euler(45, 0, 0);
+                    break;
+                case GameMode.FreeFlying:
+                    ui.SetActive(false);
+                    hexGrid.SetActive(false);
+                    tileSelectionUI.SetActive(false);
+
+                    player.SetActive(true);
+
+                    // Открепляем камеру для свободного полета
+                    _mainCameraTransform.SetParent(null);
                     break;
             }
         }

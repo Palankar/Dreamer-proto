@@ -566,6 +566,10 @@ MonoBehaviour:
   zoomSpeed: 10
   minZoom: 5
   maxZoom: 60
+  moveSpeedFlying: 7.5
+  zoomSpeedFlying: 2
+  minZoomFlying: 0
+  maxZoomFlying: 20
   gameModeManager: {fileID: 1362953441}
 --- !u!1 &1161404663
 GameObject:

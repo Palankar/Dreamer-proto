@@ -8,14 +8,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - placementLayer
+  - 
   - Water
   - UI
-  - hexLayer
-  - Environment
-  - TileLayer
-  - SurfaceLayer
-  - UI3DPreview
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

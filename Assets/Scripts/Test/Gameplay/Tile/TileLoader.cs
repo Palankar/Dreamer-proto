@@ -36,12 +36,15 @@ namespace Test
                 tileConfigs.ForEach(config => config.Validate());
 
                 List<GameObject> loadedTiles = new List<GameObject>();
-                foreach (TileConfig tileConfig in tileConfigs)
+                Dictionary<string, GameObject> loadedModels = loaderManager.GetLoader()
+                    .LoadAllModelsWithName(PathConfig.TilesPath);
+                
+                foreach (GameObject loadedTile in loadedModels.Values)
                 {
-                    GameObject tile = loaderManager.GetLoader().LoadModel(PathConfig.TilesPath, tileConfig.modelFile);
+                    GameObject tile = loadedTile;
                     tile.transform.position = new Vector3(100, 0, 100);
 
-                    SetTileComponents(loaderManager.GetLoader(), ref tile, tileConfig);
+                    SetBaseTileComponents(loaderManager.GetLoader(), ref tile);
 
                     loadedTiles.Add(tile);
                 }
@@ -53,29 +56,27 @@ namespace Test
         }
 
 
-        private void SetTileComponents(LoaderInt loader, ref GameObject tile, TileConfig tileConfig)
+        private void SetBaseTileComponents(LoaderInt loader, ref GameObject tile)
         {
             tile.AddComponent<MeshCollider>();
 
-            Material material = loader.LoadMaterial(tileConfig.materialFile);
+            Material material = loader.LoadMaterial("base");
 
             MeshRenderer meshRenderer = tile.AddComponent<MeshRenderer>();
             meshRenderer.material = material;
 
             HexTile hexTile = tile.AddComponent<HexTile>();
-            hexTile.Sprite = loader.LoadIcon(tileConfig.iconFile);
-            hexTile.TileConfig = tileConfig;
 
             GameObject spawnPosition = new GameObject("SpawnPosition");
             spawnPosition.transform.parent = tile.transform;
             spawnPosition.transform.localPosition = new Vector3(
-                tileConfig.spawnPosition[0],
-                tileConfig.spawnPosition[1],
-                tileConfig.spawnPosition[2]
+                0,
+                15,
+                0
             );
 
             hexTile.spawnPosition = spawnPosition;
         }
-
+        
     }
 }

@@ -12,7 +12,6 @@ namespace Test.Utilities.Entities
         public string name;
         public string modelFile;
         public string materialFile;
-        public string iconFile;
         public float[] spawnPosition;
         public Environment environment;
         

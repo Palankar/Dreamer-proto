@@ -1,76 +1,179 @@
 using System.Collections.Generic;
+using Test;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Test
+public class TileSelectionUIManager : MonoBehaviour
 {
-    /**
-     * Менеджер визуального интерфейса.
-     */
-    public class TileSelectionUIManager : MonoBehaviour
+    public RectTransform buttonContainer;
+    public GameObject tileLoaderManager;
+
+    [Header("Preview")]
+    public PreviewBatchRenderer previewBatchRenderer;
+    public List<RenderTexture> buttonRenderTextures; // 5 штук
+
+    [Header("Scroll")]
+    public Scrollbar scrollbar;
+
+    protected List<GameObject> loadedTiles = new();
+    protected TileLoader _tileLoader;
+
+    protected int _selectedTileIndex = -1;
+
+    private readonly List<Button> _buttons = new();
+    private const int TilesPerPage = 5;
+
+    private int _currentStartIndex = 0;
+    private bool _suppressScrollbarCallback;
+
+    void Awake()
     {
-        public Transform buttonContainer; // Контейнер для кнопок (например, Panel)
-        public Button buttonPrefab; // Префаб кнопки
-        public GameObject tileLoaderManager;
-        
-        private List<GameObject> loadedTiles = new(); // Динамический список тайлов
-        private TileLoader _tileLoader;
+        if (!buttonContainer) Debug.LogError("ButtonContainer не назначен!");
+        if (!tileLoaderManager) Debug.LogError("TileLoaderManager не назначен!");
+        if (!previewBatchRenderer) Debug.LogError("PreviewBatchRenderer не назначен!");
+        if (!scrollbar) Debug.LogError("Scrollbar не назначен!");
+    }
 
-        private int _selectedTileIndex = -1; // Индекс выбранного тайла (-1, если не выбран)
+    void Start()
+    {
+        _tileLoader = tileLoaderManager.GetComponent<TileLoader>();
+        loadedTiles = _tileLoader.LoadTiles();
 
-        void Awake()
+        CacheButtonsFromContainer();
+
+        // Подписка на скролл
+        scrollbar.onValueChanged.AddListener(OnScrollChanged);
+
+        SetupScrollbar();       // настроим размер “окна” и стартовую позицию
+        RefreshVisibleTiles(0); // первая страница
+    }
+
+    void OnDestroy()
+    {
+        if (scrollbar) scrollbar.onValueChanged.RemoveListener(OnScrollChanged);
+    }
+
+    void CacheButtonsFromContainer()
+    {
+        _buttons.Clear();
+        buttonContainer.GetComponentsInChildren(true, _buttons);
+
+        if (_buttons.Count < TilesPerPage)
+            Debug.LogWarning($"Кнопок меньше чем {TilesPerPage}: {_buttons.Count}");
+    }
+
+    void SetupScrollbar()
+    {
+        // Важно: Scrollbar.value в диапазоне [0..1]
+        // size — “размер окна” относительно всего “контента” (опционально, но приятно)
+        if (loadedTiles.Count <= TilesPerPage)
         {
-            if (buttonContainer == null) Debug.LogError("ButtonContainer не назначен!");
-            if (buttonPrefab == null) Debug.LogError("ButtonPrefab не назначен!");
-            if (tileLoaderManager == null) Debug.LogError("TileLoaderManager не назначен!");
+            // всё помещается — скролл не нужен
+            _suppressScrollbarCallback = true;
+            scrollbar.size = 1f;
+            scrollbar.value = 0f;
+            scrollbar.interactable = false;
+            _suppressScrollbarCallback = false;
+            return;
         }
-        
-        void Start()
-        {
-            _tileLoader = tileLoaderManager.GetComponent<TileLoader>();
-            loadedTiles = _tileLoader.LoadTiles();
-            PopulateTileButtons();
-        }
 
-        void PopulateTileButtons()
+        scrollbar.interactable = true;
+        scrollbar.size = Mathf.Clamp01((float)TilesPerPage / loadedTiles.Count);
+
+        // старт: в начало
+        _suppressScrollbarCallback = true;
+        scrollbar.value = 0f;
+        _suppressScrollbarCallback = false;
+    }
+
+    void OnScrollChanged(float value)
+    {
+        if (_suppressScrollbarCallback) return;
+
+        int maxStart = Mathf.Max(0, loadedTiles.Count - TilesPerPage);
+
+        // Превращаем value [0..1] в startIndex [0..maxStart]
+        // Обычно лучше FLOOR, чтобы при небольшом движении не “дёргалось”.
+        int startIndex = Mathf.FloorToInt(value * (maxStart + 0.0001f));
+
+        if (startIndex == _currentStartIndex) return;
+
+        RefreshVisibleTiles(startIndex);
+    }
+
+    void RefreshVisibleTiles(int startIndex)
+    {
+        _currentStartIndex = Mathf.Clamp(startIndex, 0, Mathf.Max(0, loadedTiles.Count - TilesPerPage));
+
+        int count = Mathf.Min(TilesPerPage, _buttons.Count);
+
+        var items = new List<PreviewBatchRenderer.PreviewItem>(count);
+
+        for (int i = 0; i < count; i++)
         {
-            int width = loadedTiles.Count / 2;
-            for (int i = 0; i < loadedTiles.Count; i++)
+            var btn = _buttons[i];
+
+            int tileIndex = _currentStartIndex + i;
+
+            if (tileIndex >= loadedTiles.Count)
             {
-                GameObject tile = loadedTiles[i];
-                
-                // Создаем новую кнопку
-                Button newButton = Instantiate(buttonPrefab, buttonContainer);
-                
-                // Задаем позицию кнопки
-                newButton.gameObject.transform.localPosition = new Vector2((width * -200) + (160 * i + 40 * i), 0);
-                
-                // Настраиваем изображение кнопки
-                Image buttonImage = newButton.GetComponent<Image>();
-                Sprite tileSprite = tile.GetComponent<HexTile>().Sprite;
-                buttonImage.sprite = tileSprite;
-                
-                // Копируем индекс в локальную переменную, чтобы избежать замыканий
-                int index = i; 
-
-                // Добавляем обработчик клика
-                newButton.onClick.AddListener(() => SelectTile(index));
+                // Нет тайла для этой кнопки — выключаем кнопку
+                btn.interactable = false;
+                btn.gameObject.SetActive(false);
+                continue;
             }
-        }
 
-        public void SelectTile(int index)
-        {
-            _selectedTileIndex = index;
-            Debug.Log($"Выбранный тайл: {loadedTiles[_selectedTileIndex].name}");
-        }
+            btn.gameObject.SetActive(true);
+            btn.interactable = true;
 
-        public GameObject GetSelectedTilePrefab()
-        {
-            if (_selectedTileIndex >= 0 && _selectedTileIndex < loadedTiles.Count)
+            var tilePrefab = loadedTiles[tileIndex];
+
+            // RawImage внутри кнопки
+            var raw = btn.GetComponentInChildren<RawImage>(true);
+            if (!raw)
             {
-                return loadedTiles[_selectedTileIndex];
+                Debug.LogError($"На кнопке #{i} нет RawImage для превью!");
+                continue;
             }
-            return null;
+
+            // Клик выбирает ИМЕННО tileIndex (глобальный индекс!)
+            int capturedIndex = tileIndex;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => SelectTile(capturedIndex));
+
+            // RenderTexture для этой кнопки
+            RenderTexture rt = (buttonRenderTextures != null && i < buttonRenderTextures.Count)
+                ? buttonRenderTextures[i]
+                : null;
+
+            if (!rt)
+            {
+                Debug.LogError($"Не задан RenderTexture для кнопки #{i}. Добавь 5 RT в инспектор.");
+                continue;
+            }
+
+            items.Add(new PreviewBatchRenderer.PreviewItem
+            {
+                prefab = tilePrefab,
+                rawImage = raw,
+                renderTexture = rt
+            });
         }
+
+        previewBatchRenderer.SetItems(items);
+        previewBatchRenderer.RenderAll();
+    }
+
+    protected virtual void SelectTile(int index)
+    {
+        _selectedTileIndex = index;
+        Debug.Log($"Выбранный тайл: {loadedTiles[_selectedTileIndex].name}");
+    }
+
+    public GameObject GetSelectedTilePrefab()
+    {
+        if (_selectedTileIndex >= 0 && _selectedTileIndex < loadedTiles.Count)
+            return loadedTiles[_selectedTileIndex];
+        return null;
     }
 }

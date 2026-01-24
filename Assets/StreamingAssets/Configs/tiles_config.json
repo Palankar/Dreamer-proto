@@ -1,6 +1,6 @@
 ﻿[
   {
-    "name": "Desert",
+    "name": "Plain",
     "modelFile": "Plain.obj",
     "materialFile": "test",
     "iconFile": "Tile1.png",
@@ -65,18 +65,5 @@
         }
       ]
     }
-  },
-  {
-    "name": "Mountain",
-    "modelFile": "Plain.obj",
-    "materialFile": "test",
-    "iconFile": "Tile2.png",
-    "spawnPosition": [-0.05, 1.0, -0.05],
-    "environment": {
-      "stones": [],
-      "trees": []
-    }
-
-
   }
 ]

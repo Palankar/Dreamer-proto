@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Test.Configs;
 using Test.Utilities.Entities;
 using UnityEngine;
@@ -23,6 +24,40 @@ namespace Test
             meshFilter.mesh = mesh;
 
             return model;
+        }
+
+        public List<GameObject> LoadAllModels(string modelsPath)
+        {
+            string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath);
+            List<GameObject> models = new List<GameObject>();
+            
+            List<string> modelsNames = Directory
+                .GetFiles(modelPath)
+                .Select(Path.GetFileNameWithoutExtension)
+                .ToList();
+
+            foreach (string modelName in modelsNames)
+            {
+                models.Add(LoadModel(modelsPath, modelName));
+            }
+            return models;
+        }
+
+        public Dictionary<string, GameObject> LoadAllModelsWithName(string modelsPath)
+        {
+            string modelPath = Path.Combine(Application.streamingAssetsPath, modelsPath);
+            Dictionary<string, GameObject> modelsWithName = new Dictionary<string, GameObject>();
+            
+            List<string> modelsNames = Directory
+                .GetFiles(modelPath, "*.obj")
+                .Select(Path.GetFileNameWithoutExtension)
+                .ToList();
+            
+            foreach (string modelName in modelsNames)
+            {
+                modelsWithName.Add(modelName, LoadModel(modelsPath, modelName + ".obj"));
+            }
+            return modelsWithName;
         }
 
         public Material LoadMaterial(string materialFile)

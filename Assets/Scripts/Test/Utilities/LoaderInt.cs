@@ -1,4 +1,5 @@
-﻿using Test.Utilities.Entities;
+﻿using System.Collections.Generic;
+using Test.Utilities.Entities;
 using UnityEngine;
 
 namespace Test
@@ -6,6 +7,9 @@ namespace Test
     public interface LoaderInt
     {
         public GameObject LoadModel(string modelsPath, string modelFile);
+        
+        public List<GameObject> LoadAllModels(string modelsPath);
+        public Dictionary<string, GameObject> LoadAllModelsWithName(string modelsPath);
 
         public Material LoadMaterial(string materialFile);
 
